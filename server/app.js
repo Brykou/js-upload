@@ -63,11 +63,27 @@ app.delete("/files/:id", (req, res, next) => {
   const filePath = uploadFolder + fileId;
   fs.unlink(filePath, err => {
     if (err) {
-      res.status(500).send("Cannot remove file " + fileId);
-      return next(new Error(err.stack));
+      return next(err);
     }
     res.status(200).send("File " + fileId + " deleted");
   });
+});
+
+app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+  console.error(err);
+
+  if (err.code.includes("LIMIT_")) {
+    return res.status(422).send("Something is oversized !");
+  }
+
+  if (err.code === "ENOENT") {
+    return res.status(404).send("Can't find the ressource");
+  }
+
+  res.status(500).send("Something broke!");
 });
 
 app.listen(port, () => console.log("Server is listening on port " + port));
