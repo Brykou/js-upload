@@ -19,6 +19,9 @@ const authorizedUploadTypes = [
   "text/plain"
 ];
 
+// Multer config
+// Limit: Add constraints on user inputs
+// fileFilter: Perform a check on mime type before uploading file on server
 const upload = multer({
   dest: uploadFolder,
   limits: {
@@ -41,6 +44,11 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json({ strict: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+/**
+ * Retrieve all files already uploaded
+ * @method GET
+ * @returns list of file names
+ */
 app.get("/files", (req, res) => {
   const fileList = [];
   fs.readdir(uploadFolder, (err, files) => {
@@ -51,6 +59,12 @@ app.get("/files", (req, res) => {
   });
 });
 
+/**
+ * Upload a new file
+ * @method POST
+ * @param fileToUpload data from input form
+ * @returns id used to store file on the server, and original name
+ */
 app.post("/files", upload.single("fileToUpload"), (req, res) => {
   res.send({
     id: req.file.filename,
@@ -58,6 +72,11 @@ app.post("/files", upload.single("fileToUpload"), (req, res) => {
   });
 });
 
+/**
+ * Delete a specific file
+ * @method DELETE
+ * @param id file id return by POST /files endpoint
+ */
 app.delete("/files/:id", (req, res, next) => {
   const fileId = req.params.id;
   const filePath = uploadFolder + fileId;
@@ -69,16 +88,22 @@ app.delete("/files/:id", (req, res, next) => {
   });
 });
 
+/**
+ * Error handler
+ */
 app.use((err, req, res, next) => {
   if (res.headersSent) {
     return next(err);
   }
   console.error(err);
 
+  // Handle mutler checks
+  // see https://github.com/expressjs/multer/blob/eef091188d3f2c40d0da145d75114434b2b3f840/lib/make-error.js
   if (err.code.includes("LIMIT_")) {
     return res.status(422).send("Something is oversized !");
   }
 
+  // Handle "not found" on delete request
   if (err.code === "ENOENT") {
     return res.status(404).send("Can't find the ressource");
   }
