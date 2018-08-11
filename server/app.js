@@ -2,27 +2,44 @@ const express = require("express");
 const fs = require("fs");
 const multer = require("multer");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const port = 3001;
 const uploadFolder = "uploads/";
 
 const corsOptions = {
   origin: "http://localhost:3000",
-  methods: ["GET", "HEAD", "POST", "DELETE"]
+  methods: ["GET", "POST", "DELETE"]
 };
 
-const storage = multer.diskStorage({
-  destination: uploadFolder,
-  filename(req, file, cb) {
-    cb(null, `${new Date().getTime()}-${file.originalname}`);
-  }
-});
+const authorizedUploadTypes = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "text/plain"
+];
+
 const upload = multer({
-  storage: storage
+  dest: uploadFolder,
+  limits: {
+    fieldNameSize: 100,
+    fields: 10,
+    fileSize: 125000, //1MB
+    files: 1,
+    parts: 10
+  },
+  fileFilter: (req, file, cb) => {
+    if (authorizedUploadTypes.includes(file.mimetype) === false) {
+      return cb(new Error("File type not allowed: " + file.mimetype), true);
+    }
+    cb(null, true);
+  }
 });
 
 const app = express();
 app.use(cors(corsOptions));
+app.use(bodyParser.json({ strict: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/files", (req, res) => {
   const fileList = [];
