@@ -41,4 +41,16 @@ app.post("/files", upload.single("fileToUpload"), (req, res) => {
   });
 });
 
+app.delete("/files/:id", (req, res, next) => {
+  const fileId = req.params.id;
+  const filePath = uploadFolder + fileId;
+  fs.unlink(filePath, err => {
+    if (err) {
+      res.status(500).send("Cannot remove file " + fileId);
+      return next(new Error(err.stack));
+    }
+    res.status(200).send("File " + fileId + " deleted");
+  });
+});
+
 app.listen(port, () => console.log("Server is listening on port " + port));
