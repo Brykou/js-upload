@@ -8,15 +8,28 @@ class Uploader extends React.Component {
     onUpload: PropTypes.func.isRequired
   };
 
+  shouldComponentUpdate() {
+    return false;
+  }
+
   handleUploadFile = event => {
-    const { onUpload } = this.props;
-    const data = new FormData();
-    data.append("fileToUpload", event.target.files[0]);
-    onUpload(data);
+    const file = event.target.files[0];
+    if (file) {
+      const { onUpload } = this.props;
+      const data = new FormData();
+      data.append("fileToUpload", file);
+      onUpload(data);
+    }
   };
 
   render() {
-    return <input type="file" onChange={this.handleUploadFile} />;
+    return (
+      <input
+        type="file"
+        accept=".jpg, .jpeg, .gif, .png, .txt"
+        onChange={this.handleUploadFile}
+      />
+    );
   }
 }
 

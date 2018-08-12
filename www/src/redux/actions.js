@@ -98,7 +98,7 @@ export function uploadFile(data) {
       .catch(error => {
         dispatch(
           uploadFailed(
-            "Can't upload file. Check file size (<1MB), and allowed format (.jpeg, .png, .gif, .txt)"
+            "Can't upload file. Check file size (<100KB), and allowed format (.jpeg, .png, .gif, .txt)"
           )
         );
       });

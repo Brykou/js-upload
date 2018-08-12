@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import FileItem from "./FileItem";
 import "./fileList.css";
 
-class FileList extends React.Component {
+class FileList extends React.PureComponent {
   static displayName = "FileList";
 
   static propTypes = {
