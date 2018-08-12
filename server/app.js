@@ -4,6 +4,8 @@ const multer = require("multer");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
+const low = require("lowdb");
+const FileSync = require("lowdb/adapters/FileSync");
 const config = require("./config");
 
 // Multer config
@@ -11,13 +13,7 @@ const config = require("./config");
 // fileFilter: Perform a check on mime type before uploading file on server
 const upload = multer({
   dest: config.uploadFolder,
-  limits: {
-    fieldNameSize: 100,
-    fields: 10,
-    fileSize: 125000, //1MB
-    files: 1,
-    parts: 10
-  },
+  limits: config.multerLimits,
   fileFilter: (req, file, cb) => {
     if (config.authorizedUploadTypes.includes(file.mimetype) === false) {
       return cb(new Error("File type not allowed: " + file.mimetype), true);
@@ -25,6 +21,9 @@ const upload = multer({
     cb(null, true);
   }
 });
+
+const db = low(new FileSync(config.uploadFolder + config.database.name));
+db.defaults({ files: [] }).write();
 
 const app = express();
 app.use(cors(config.corsOptions));
@@ -35,16 +34,11 @@ app.use("/static", express.static(path.join(__dirname, config.uploadFolder)));
 /**
  * Retrieve all files already uploaded
  * @method GET
- * @returns list of file names
+ * @returns list of file names and id (see json data file)
  */
 app.get("/files", (req, res) => {
-  const fileList = [];
-  fs.readdir(config.uploadFolder, (err, files) => {
-    files.forEach(file => {
-      fileList.push(file);
-    });
-    res.send(fileList);
-  });
+  const fileList = db.get("files").value();
+  res.send(fileList);
 });
 
 /**
@@ -54,10 +48,14 @@ app.get("/files", (req, res) => {
  * @returns id used to store file on the server, and original name
  */
 app.post("/files", upload.single("fileToUpload"), (req, res) => {
-  res.send({
+  const newFile = {
     id: req.file.filename,
     name: req.file.originalname
-  });
+  };
+  db.get("files")
+    .push(newFile)
+    .write();
+  res.send(newFile);
 });
 
 /**
@@ -72,6 +70,9 @@ app.delete("/files/:id", (req, res, next) => {
     if (err) {
       return next(err);
     }
+    db.get("files")
+      .remove({ id: fileId })
+      .write();
     res.send(fileId);
   });
 });

@@ -1,6 +1,6 @@
 import axios from "axios";
 var axiosInstance = axios.create({
-  baseURL: "http://localhost:3001/"
+  baseURL: process.env.PUBLIC_URL
 });
 
 export const FETCH_START = "request_files";
@@ -80,7 +80,7 @@ export function uploadFile(data) {
   return function(dispatch) {
     dispatch(uploadStart());
     return axiosInstance.post("/files", data).then(response => {
-      dispatch(uploadSuccess(response.data.id));
+      dispatch(uploadSuccess(response.data));
     });
   };
 }

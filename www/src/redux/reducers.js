@@ -47,7 +47,7 @@ export default (state = initialState, action) => {
     case REMOVE_SUCCESS:
       return Object.assign({}, state, {
         isRemoving: false,
-        files: state.files.filter(id => id !== action.payload)
+        files: state.files.filter(({ id }) => id !== action.payload)
       });
     case REMOVE_FAIL:
       return Object.assign({}, state, {
