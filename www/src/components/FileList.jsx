@@ -2,21 +2,35 @@ import React from "react";
 import PropTypes from "prop-types";
 import "./fileList.css";
 
-function FileItem({ id, name, onRemove }) {
+function FileItem({ file, onRemove }) {
+  const { id, name, mimeType } = file;
   return (
     <li className="item">
       <div>
-        <img
-          className="thumbnail"
-          src={`${process.env.PUBLIC_URL}/static/${id}`}
-          alt={name}
-        />
+        {mimeType.includes("image") ? (
+          <img
+            className="thumbnail"
+            src={`${process.env.PUBLIC_URL}/static/${id}`}
+            alt={name}
+          />
+        ) : (
+          <div className="text">No preview</div>
+        )}
       </div>
-      <div className="title">{name}</div>
+      <div className="text">{name}</div>
       <button onClick={() => onRemove(id)}>Delete</button>
     </li>
   );
 }
+FileItem.displayName = "FileItem";
+FileItem.propTypes = {
+  file: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    mimeType: PropTypes.string.isRequired
+  }),
+  onRemove: PropTypes.func.isRequired
+};
 
 class FileList extends React.Component {
   static displayName = "FileList";
@@ -25,7 +39,8 @@ class FileList extends React.Component {
     files: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired
+        name: PropTypes.string.isRequired,
+        mimeType: PropTypes.string.isRequired
       })
     ).isRequired,
     onRemove: PropTypes.func.isRequired
@@ -36,14 +51,7 @@ class FileList extends React.Component {
     return (
       <ul className="list">
         {files.map(file => {
-          return (
-            <FileItem
-              key={file.id}
-              id={file.id}
-              name={file.name}
-              onRemove={onRemove}
-            />
-          );
+          return <FileItem key={file.id} file={file} onRemove={onRemove} />;
         })}
       </ul>
     );

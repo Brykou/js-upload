@@ -50,7 +50,8 @@ app.get("/files", (req, res) => {
 app.post("/files", upload.single("fileToUpload"), (req, res) => {
   const newFile = {
     id: req.file.filename,
-    name: req.file.originalname
+    name: req.file.originalname,
+    mimeType: req.file.mimetype
   };
   db.get("files")
     .push(newFile)
