@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const low = require("lowdb");
 const FileSync = require("lowdb/adapters/FileSync");
+var helmet = require("helmet");
 const config = require("./config");
 
 // Multer init
@@ -30,6 +31,16 @@ app.use(cors(config.corsOptions));
 app.use(bodyParser.json({ strict: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/static", express.static(path.join(__dirname, config.uploadFolder)));
+app.use(helmet());
+app.disable("x-powered-by");
+app.use(helmet.xssFilter());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"]
+    }
+  })
+);
 
 /**
  * Retrieve all files already uploaded
