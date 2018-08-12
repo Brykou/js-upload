@@ -88,12 +88,12 @@ app.use((err, req, res, next) => {
 
   // Handle mutler checks
   // see https://github.com/expressjs/multer/blob/eef091188d3f2c40d0da145d75114434b2b3f840/lib/make-error.js
-  if (err.code.includes("LIMIT_")) {
+  if (err.code && err.code.includes("LIMIT_")) {
     return res.status(422).send("Something is oversized !");
   }
 
   // Handle "not found" on delete request
-  if (err.code === "ENOENT") {
+  if (err.code && err.code === "ENOENT") {
     return res.status(404).send("Can't find the ressource");
   }
 

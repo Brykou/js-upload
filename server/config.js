@@ -12,7 +12,7 @@ module.exports = {
   multerLimits: {
     fieldNameSize: 100,
     fields: 10,
-    fileSize: 125000, //1MB
+    fileSize: 1000000, //1MB
     files: 1,
     parts: 10
   }

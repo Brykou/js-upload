@@ -11,6 +11,7 @@ export const UPLOAD_FAIL = "upload_fail";
 export const REMOVE_START = "remove_start";
 export const REMOVE_SUCCESS = "remove_success";
 export const REMOVE_FAIL = "remove_fail";
+export const DISMISS_ERROR = "dismiss_error";
 
 export function fetchStart() {
   return {
@@ -39,9 +40,10 @@ export function uploadSuccess(id) {
   };
 }
 
-export function uploadFailed() {
+export function uploadFailed(error) {
   return {
-    type: UPLOAD_FAIL
+    type: UPLOAD_FAIL,
+    payload: error
   };
 }
 
@@ -59,9 +61,16 @@ export function removeSuccess(id) {
   };
 }
 
-export function removeFailed() {
+export function removeFailed(error) {
   return {
-    type: REMOVE_FAIL
+    type: REMOVE_FAIL,
+    payload: error
+  };
+}
+
+export function dismissError() {
+  return {
+    type: DISMISS_ERROR
   };
 }
 
@@ -79,17 +88,31 @@ export function fetchFiles() {
 export function uploadFile(data) {
   return function(dispatch) {
     dispatch(uploadStart());
-    return axiosInstance.post("/files", data).then(response => {
-      dispatch(uploadSuccess(response.data));
-    });
+    return axiosInstance
+      .post("/files", data)
+      .then(response => {
+        dispatch(uploadSuccess(response.data));
+      })
+      .catch(error => {
+        dispatch(
+          uploadFailed(
+            "Can't upload file. Check file size (<1MB), and allowed format (.jpeg, .png, .gif, .txt)"
+          )
+        );
+      });
   };
 }
 
 export function removeFile(id) {
   return function(dispatch) {
     dispatch(removeStart());
-    return axiosInstance.delete("/files/" + id).then(response => {
-      dispatch(removeSuccess(response.data));
-    });
+    return axiosInstance
+      .delete("/files/" + id)
+      .then(response => {
+        dispatch(removeSuccess(response.data));
+      })
+      .catch(error => {
+        dispatch(removeFailed("Failed to delete this file"));
+      });
   };
 }
