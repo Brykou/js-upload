@@ -12,6 +12,10 @@ class App extends React.Component {
         <h1 className="App-title">Upload files</h1>
         <Error />
         <Uploader />
+        <div className="outline">
+          File size should not exceed 100KB. Supporting formats: jpg, png, gif,
+          txt.
+        </div>
         <Search />
         <FileList />
       </div>

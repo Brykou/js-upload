@@ -110,7 +110,7 @@ app.use((err, req, res, next) => {
   }
   console.error(err);
 
-  // Handle mutler checks
+  // Handle Multer checks
   // see https://github.com/expressjs/multer/blob/eef091188d3f2c40d0da145d75114434b2b3f840/lib/make-error.js
   if (err.code && err.code.includes("LIMIT_")) {
     return res.status(422).send("Something is oversized !");
