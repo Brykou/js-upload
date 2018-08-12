@@ -8,9 +8,7 @@ const low = require("lowdb");
 const FileSync = require("lowdb/adapters/FileSync");
 const config = require("./config");
 
-// Multer config
-// Limit: Add constraints on user inputs
-// fileFilter: Perform a check on mime type before uploading file on server
+// Multer init
 const upload = multer({
   dest: config.uploadFolder,
   limits: config.multerLimits,
@@ -22,9 +20,11 @@ const upload = multer({
   }
 });
 
+// Low DB init
 const db = low(new FileSync(config.uploadFolder + config.database.name));
 db.defaults({ files: [] }).write();
 
+// Express init
 const app = express();
 app.use(cors(config.corsOptions));
 app.use(bodyParser.json({ strict: true }));
@@ -34,7 +34,15 @@ app.use("/static", express.static(path.join(__dirname, config.uploadFolder)));
 /**
  * Retrieve all files already uploaded
  * @method GET
- * @returns list of file names and id (see json data file)
+ * @returns list of file items (see json data file)
+ * @example {Response}
+ * [{
+ *  data: {
+ *    id: 24b5e7019e7d99c986d472c222392116,
+ *    name: "react.jpg",
+ *    mimeType: "image.jpeg"
+ *  }
+ * }]
  */
 app.get("/files", (req, res) => {
   const fileList = db.get("files").value();
@@ -45,7 +53,15 @@ app.get("/files", (req, res) => {
  * Upload a new file
  * @method POST
  * @param fileToUpload data from input form
- * @returns id used to store file on the server, and original name
+ * @returns file item (see json data file)
+ * @example {Response}
+ * {
+ *  data: {
+ *    id: 24b5e7019e7d99c986d472c222392116,
+ *    name: "react.jpg",
+ *    mimeType: "image.jpeg"
+ *  }
+ * }
  */
 app.post("/files", upload.single("fileToUpload"), (req, res) => {
   const newFile = {
@@ -63,6 +79,13 @@ app.post("/files", upload.single("fileToUpload"), (req, res) => {
  * Delete a specific file
  * @method DELETE
  * @param id file id return by POST /files endpoint
+ * @returns file id
+ * @example {Response}
+ * {
+ *  data: {
+ *    id: 24b5e7019e7d99c986d472c222392116
+ *  }
+ * }
  */
 app.delete("/files/:id", (req, res, next) => {
   const fileId = req.params.id;

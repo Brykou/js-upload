@@ -13,6 +13,8 @@ export const REMOVE_SUCCESS = "remove_success";
 export const REMOVE_FAIL = "remove_fail";
 export const DISMISS_ERROR = "dismiss_error";
 
+// Sync actions
+
 export function fetchStart() {
   return {
     type: FETCH_START
