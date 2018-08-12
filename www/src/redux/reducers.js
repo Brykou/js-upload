@@ -7,7 +7,8 @@ import {
   REMOVE_START,
   REMOVE_SUCCESS,
   REMOVE_FAIL,
-  DISMISS_ERROR
+  DISMISS_ERROR,
+  UPDATE_FILTER
 } from "./actions.js";
 
 const initialState = {
@@ -15,7 +16,8 @@ const initialState = {
   error: null,
   isFetching: false,
   isRemoving: false,
-  isUploading: false
+  isUploading: false,
+  search: ""
 };
 
 export default (state = initialState, action) => {
@@ -65,6 +67,11 @@ export default (state = initialState, action) => {
       });
     case DISMISS_ERROR:
       return Object.assign({}, state, {
+        error: null
+      });
+    case UPDATE_FILTER:
+      return Object.assign({}, state, {
+        search: action.payload,
         error: null
       });
     default:

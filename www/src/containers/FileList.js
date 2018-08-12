@@ -3,7 +3,10 @@ import FileList from "../components/FileList";
 import { removeFile } from "../redux/actions";
 
 const mapStateToProps = state => ({
-  files: state.files
+  // Filter files depending on user input in seach bar
+  files: state.files.filter(file => {
+    return file.name.includes(state.search);
+  })
 });
 
 const mapDispatchToProps = dispatch => ({

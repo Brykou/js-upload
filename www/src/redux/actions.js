@@ -12,6 +12,7 @@ export const REMOVE_START = "remove_start";
 export const REMOVE_SUCCESS = "remove_success";
 export const REMOVE_FAIL = "remove_fail";
 export const DISMISS_ERROR = "dismiss_error";
+export const UPDATE_FILTER = "update_filter";
 
 // Sync actions
 
@@ -73,6 +74,13 @@ export function removeFailed(error) {
 export function dismissError() {
   return {
     type: DISMISS_ERROR
+  };
+}
+
+export function updateFilter(input) {
+  return {
+    type: UPDATE_FILTER,
+    payload: input
   };
 }
 
