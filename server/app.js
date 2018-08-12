@@ -3,27 +3,14 @@ const fs = require("fs");
 const multer = require("multer");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-
-const port = 3001;
-const uploadFolder = "uploads/";
-
-const corsOptions = {
-  origin: "http://localhost:3000",
-  methods: ["GET", "POST", "DELETE"]
-};
-
-const authorizedUploadTypes = [
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "text/plain"
-];
+const path = require("path");
+const config = require("./config");
 
 // Multer config
 // Limit: Add constraints on user inputs
 // fileFilter: Perform a check on mime type before uploading file on server
 const upload = multer({
-  dest: uploadFolder,
+  dest: config.uploadFolder,
   limits: {
     fieldNameSize: 100,
     fields: 10,
@@ -32,7 +19,7 @@ const upload = multer({
     parts: 10
   },
   fileFilter: (req, file, cb) => {
-    if (authorizedUploadTypes.includes(file.mimetype) === false) {
+    if (config.authorizedUploadTypes.includes(file.mimetype) === false) {
       return cb(new Error("File type not allowed: " + file.mimetype), true);
     }
     cb(null, true);
@@ -40,9 +27,10 @@ const upload = multer({
 });
 
 const app = express();
-app.use(cors(corsOptions));
+app.use(cors(config.corsOptions));
 app.use(bodyParser.json({ strict: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use("/static", express.static(path.join(__dirname, config.uploadFolder)));
 
 /**
  * Retrieve all files already uploaded
@@ -51,7 +39,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
  */
 app.get("/files", (req, res) => {
   const fileList = [];
-  fs.readdir(uploadFolder, (err, files) => {
+  fs.readdir(config.uploadFolder, (err, files) => {
     files.forEach(file => {
       fileList.push(file);
     });
@@ -79,7 +67,7 @@ app.post("/files", upload.single("fileToUpload"), (req, res) => {
  */
 app.delete("/files/:id", (req, res, next) => {
   const fileId = req.params.id;
-  const filePath = uploadFolder + fileId;
+  const filePath = config.uploadFolder + fileId;
   fs.unlink(filePath, err => {
     if (err) {
       return next(err);
@@ -111,4 +99,6 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something broke!");
 });
 
-app.listen(port, () => console.log("Server is listening on port " + port));
+app.listen(config.port, () =>
+  console.log("Server is listening on port " + config.port)
+);
