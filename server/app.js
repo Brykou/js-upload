@@ -36,6 +36,9 @@ app.use("/static", express.static(path.join(__dirname, config.uploadFolder)));
 app.use(helmet());
 app.disable("x-powered-by");
 app.use(helmet.xssFilter());
+app.use(helmet.frameguard({ action: "sameorigin" }));
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.noSniff());
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
