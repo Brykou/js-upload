@@ -15,7 +15,7 @@ const upload = multer({
   limits: config.multerLimits,
   fileFilter: (req, file, cb) => {
     if (config.authorizedUploadTypes.includes(file.mimetype) === false) {
-      return cb(new Error("File type not allowed: " + file.mimetype), true);
+      return cb(new Error("File type not allowed: " + file.mimetype));
     }
     cb(null, true);
   }
