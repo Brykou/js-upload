@@ -6,7 +6,8 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const low = require("lowdb");
 const FileSync = require("lowdb/adapters/FileSync");
-var helmet = require("helmet");
+const helmet = require("helmet");
+const compression = require("compression");
 const config = require("./config");
 
 // Multer init
@@ -28,6 +29,7 @@ db.defaults({ files: [] }).write();
 // Express init
 const app = express();
 app.use(cors(config.corsOptions));
+app.use(compression());
 app.use(bodyParser.json({ strict: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/static", express.static(path.join(__dirname, config.uploadFolder)));
