@@ -23,7 +23,7 @@ const upload = multer({
 });
 
 // Low DB init
-const db = low(new FileSync(config.uploadFolder + config.database.name));
+const db = low(new FileSync(config.database.name));
 db.defaults({ files: [] }).write();
 
 // Express init

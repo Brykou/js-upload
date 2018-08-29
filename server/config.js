@@ -2,7 +2,7 @@ module.exports = {
   port: 3001,
   uploadFolder: "uploads/",
   database: {
-    name: "upload.json"
+    name: "database.json"
   },
   corsOptions: {
     origin: "http://localhost:3000",
