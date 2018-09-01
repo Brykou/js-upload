@@ -103,7 +103,7 @@ export function uploadFile(data) {
       .then(response => {
         dispatch(uploadSuccess(response.data));
       })
-      .catch(error => {
+      .catch(() => {
         dispatch(
           uploadFailed(
             "Can't upload file. Check file size (<100KB), and allowed format (.jpeg, .png, .gif, .txt)"
@@ -121,7 +121,7 @@ export function removeFile(id) {
       .then(response => {
         dispatch(removeSuccess(response.data));
       })
-      .catch(error => {
+      .catch(() => {
         dispatch(removeFailed("Failed to delete this file"));
       });
   };
